@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenSTEM Research | Open Scientific Catalog & Collaboration Platform</title>
+    <!-- Google Fonts: Dosis for headers/branding, Inter for UI, JetBrains Mono for metrics -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@400;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="theme-light">
+    <!-- Background grid decoration inspired by OpenAlex scholarly aesthetic -->
+    <div class="scholarly-bg-grid"></div>
+    <div class="scholarly-bg-glow"></div>
+
+    <!-- Top Navigation Bar -->
+    <header class="top-nav">
+        <div class="nav-container">
+            <div class="brand-group" onclick="switchTab('papers')">
+                <div class="brand-mark">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                </div>
+                <div class="brand-text">
+                    <span class="brand-title">OpenSTEM<span class="highlight">Research</span></span>
+                    <span class="brand-tagline">Open Global Science & Collaboration</span>
+                </div>
+            </div>
+
+            <!-- Main Navigation Tabs -->
+            <nav class="nav-links">
+                <button class="nav-btn active" data-tab="papers" onclick="switchTab('papers')">
+                    <span class="tab-icon">📄</span> Research Papers
+                </button>
+                <button class="nav-btn" data-tab="portfolio" onclick="switchTab('portfolio')">
+                    <span class="tab-icon">🎓</span> Portfolio Builder
+                </button>
+                <button class="nav-btn" data-tab="idea-generator" onclick="switchTab('idea-generator')">
+                    <span class="tab-icon">💡</span> AI Idea Studio
+                </button>
+                <button class="nav-btn" data-tab="collaborators" onclick="switchTab('collaborators')">
+                    <span class="tab-icon">🤝</span> Research Mate
+                </button>
+                <button class="nav-btn" data-tab="teams" onclick="switchTab('teams')">
+                    <span class="tab-icon">🏛️</span> Global Labs & Teams
+                </button>
+            </nav>
+
+            <!-- Quick Action & Theme Controls -->
+            <div class="nav-actions">
+                <button class="btn-theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                    <span id="themeIcon">🌙</span>
+                </button>
+                <button class="btn-primary-action" onclick="openPublishModal()">
+                    <span>+</span> Publish Paper
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sub-hero Banner -->
+    <div class="hero-strip">
+        <div class="hero-container">
+            <div class="hero-left">
+                <h1 class="hero-headline">The Open Index for Global STEM Discovery.</h1>
+                <p class="hero-subtext">Explore the world’s latest peer-reviewed breakthroughs, build your verified researcher identity, generate AI hypotheses, and connect directly with elite research teams.</p>
+            </div>
+            <div class="hero-metrics">
+                <div class="metric-chip">
+                    <span class="metric-num">250M+</span>
+                    <span class="metric-label">Scholarly Works Tracked</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="metric-num">6 Mo & 1 Yr</span>
+                    <span class="metric-label">Rapid Breakthrough Sync</span>
+                </div>
+                <div class="metric-chip">
+                    <span class="metric-num">100% Free</span>
+                    <span class="metric-label">Open Access Catalog</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP CONTENT AREA -->
+    <main class="main-content">
+
+        <!-- ================= SECTION 1: RESEARCH PAPERS REPOSITORY ================= -->
+        <section id="tab-papers" class="tab-view active">
+            <div class="view-header">
+                <div class="search-master-wrapper">
+                    <div class="search-input-box">
+                        <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="paperSearchInput" placeholder="Search across titles, abstracts, authors, universities, quantum, CRISPR, energy..." oninput="handleSearch()">
+                        <button class="search-clear" onclick="clearSearch()" id="clearSearchBtn">&times;</button>
+                    </div>
+                </div>
+
+                <!-- Filters Strip: Field Chips & Timeframe Filter -->
+                <div class="filter-controls-row">
+                    <!-- Timeframe Pills (User requirement: Last 6 months / 1 year) -->
+                    <div class="timeframe-selector">
+                        <span class="filter-label">Recency Window:</span>
+                        <div class="pill-group">
+                            <button class="time-pill active" data-time="all" onclick="setTimeFilter('all', this)">All Time</button>
+                            <button class="time-pill" data-time="6m" onclick="setTimeFilter('6m', this)">⚡ Last 6 Months</button>
+                            <button class="time-pill" data-time="1y" onclick="setTimeFilter('1y', this)">📅 Last 1 Year</button>
+                        </div>
+                    </div>
+
+                    <!-- STEM Category Selector -->
+                    <div class="field-selector">
+                        <span class="filter-label">STEM Discipline:</span>
+                        <div class="pill-group" id="fieldPills">
+                            <button class="field-pill active" data-field="all" onclick="setFieldFilter('all', this)">All Fields</button>
+                            <button class="field-pill" data-field="Quantum" onclick="setFieldFilter('Quantum', this)">Quantum Tech</button>
+                            <button class="field-pill" data-field="Biotechnology" onclick="setFieldFilter('Biotechnology', this)">Biotech & CRISPR</button>
+                            <button class="field-pill" data-field="Clean Energy" onclick="setFieldFilter('Clean Energy', this)">Clean Energy</button>
+                            <button class="field-pill" data-field="Materials" onclick="setFieldFilter('Materials', this)">Materials Science</button>
+                            <button class="field-pill" data-field="AI" onclick="setFieldFilter('AI', this)">AI & Robotics</button>
+                            <button class="field-pill" data-field="Aerospace" onclick="setFieldFilter('Aerospace', this)">Aerospace</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Papers List Feed -->
+            <div class="feed-status-bar">
+                <span id="resultsCount">Loading research archive...</span>
+                <div class="feed-actions-secondary">
+                    <button class="btn-outline-sm" onclick="openPublishModal()">+ Ingest New Paper</button>
+                </div>
+            </div>
+
+            <div class="papers-grid" id="papersContainer">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ================= SECTION 2: RESEARCHER PORTFOLIO BUILDER ================= -->
+        <section id="tab-portfolio" class="tab-view">
+            <div class="portfolio-container">
+                <div class="portfolio-header-card">
+                    <div class="profile-hero">
+                        <div class="profile-avatar" id="profileAvatar">SL</div>
+                        <div class="profile-info-block">
+                            <div class="profile-title-row">
+                                <h2 id="profileName">Dr. Sarah Lin</h2>
+                                <span class="badge-verified">Verified Researcher</span>
+                                <span class="badge-collab-status" id="profileCollabBadge">Open to Collaboration</span>
+                            </div>
+                            <p class="profile-role" id="profileRole">Associate Professor & Principal Investigator</p>
+                            <p class="profile-institution" id="profileInstitution">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3"/></svg>
+                                <span id="profileUniv">Massachusetts Institute of Technology (MIT)</span> &bull; 
+                                <span id="profileDept">Department of Physics & Quantum Engineering</span>
+                            </p>
+                            <p class="profile-bio" id="profileBio">Researching scalable superconducting qubit architectures, fault-tolerant topological braiding, and cryogenic nanoscale electronics. Passionate about mentoring next-generation STEM researchers.</p>
+                            
+                            <div class="profile-meta-chips">
+                                <span class="orcid-chip">
+                                    <span class="orcid-icon">iD</span>
+                                    <span id="profileOrcid">0000-0002-1825-0097</span>
+                                </span>
+                                <span class="field-badge" id="profileFieldBadge">Quantum Information & Condensed Matter</span>
+                            </div>
+                        </div>
+                        <div class="profile-action-btns">
+                            <button class="btn-primary-action" onclick="openEditPortfolioModal()">Edit Portfolio</button>
+                            <button class="btn-outline" onclick="openAddPaperModal()">+ Add Paper</button>
+                        </div>
+                    </div>
+
+                    <!-- Academic Metrics Bar -->
+                    <div class="profile-stats-bar">
+                        <div class="pstat-item">
+                            <span class="pstat-val" id="profilePaperCount">3</span>
+                            <span class="pstat-desc">Published Works</span>
+                        </div>
+                        <div class="pstat-item">
+                            <span class="pstat-val" id="profileCitations">1,420</span>
+                            <span class="pstat-desc">Total Citations</span>
+                        </div>
+                        <div class="pstat-item">
+                            <span class="pstat-val" id="profileHIndex">18</span>
+                            <span class="pstat-desc">h-Index</span>
+                        </div>
+                        <div class="pstat-item">
+                            <span class="pstat-val">Tier 1</span>
+                            <span class="pstat-desc">Lab Status</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Researcher's Works Section -->
+                <div class="portfolio-works-section">
+                    <div class="section-title-row">
+                        <h3>Authored STEM Publications</h3>
+                        <span class="text-muted">Indexed under verified academic profile</span>
+                    </div>
+                    <div class="portfolio-papers-list" id="portfolioPapersList">
+                        <!-- Injected via JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 3: AI RESEARCH IDEA STUDIO ================= -->
+        <section id="tab-idea-generator" class="tab-view">
+            <div class="idea-studio-wrapper">
+                <div class="studio-header">
+                    <div class="studio-tag">AI-Augmented Science Engine</div>
+                    <h2>Autonomous STEM Hypothesis & Idea Generator</h2>
+                    <p>Leveraging frontier models (Gemini / OpenAI) to scan unresolved scientific literature gaps, formulate falsifiable hypotheses, suggest experimental setups, and identify benchmark datasets.</p>
+                </div>
+
+                <div class="studio-workspace">
+                    <!-- Left Form: Input Parameters -->
+                    <div class="studio-input-card">
+                        <h3>Define Research Coordinates</h3>
+                        
+                        <div class="form-group">
+                            <label>Target STEM Discipline</label>
+                            <select id="ideaFieldSelect" class="form-control">
+                                <option value="Quantum Computing">Quantum Computing & Cryptography</option>
+                                <option value="Biotechnology">Biotechnology & CRISPR Therapeutics</option>
+                                <option value="Clean Energy">Clean Energy & Advanced Photovoltaics</option>
+                                <option value="Materials Science">Autonomous Materials Discovery & Robotics</option>
+                                <option value="AI & Robotics">AI Foundation Models & Neuromorphic Hardware</option>
+                                <option value="Aerospace">Aerospace & Hypersonic Propulsion</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Specific Subtopic or Obstacle (Optional)</label>
+                            <input type="text" id="ideaTopicInput" class="form-control" placeholder="e.g., Qubit thermal crosstalk, non-viral delivery, perovskite stability...">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Your Background & Available Equipment (Optional)</label>
+                            <textarea id="ideaBackgroundInput" class="form-control" rows="3" placeholder="e.g., Computational chemistry group with access to 16 A100 GPUs and a liquid-handling robot..."></textarea>
+                        </div>
+
+                        <button class="btn-generate-idea" id="btnGenerateIdea" onclick="handleGenerateIdea()">
+                            <span class="btn-icon">✨</span> Generate Novel Research Proposal
+                        </button>
+                    </div>
+
+                    <!-- Right Card: Generated Idea Output -->
+                    <div class="studio-output-card" id="ideaOutputCard">
+                        <div class="output-placeholder" id="outputPlaceholder">
+                            <div class="placeholder-icon">💡</div>
+                            <h4>Ready to Synthesize Breakthrough Hypotheses</h4>
+                            <p>Select your discipline and click generate to produce structured scientific hypotheses, experimental blueprints, and citation recommendations.</p>
+                        </div>
+
+                        <div class="generated-idea-content" id="generatedIdeaContent" style="display:none;">
+                            <div class="idea-header-badge">
+                                <span class="badge-field" id="resField">Quantum Information</span>
+                                <span class="badge-novelty">High Breakthrough Potential</span>
+                            </div>
+                            
+                            <h3 class="idea-title" id="resTitle">Cryogenic Cryo-CMOS Co-Design for Scalable Surface Code Decoding</h3>
+                            
+                            <div class="idea-block">
+                                <div class="block-title">🔍 The Unresolved Scientific Gap:</div>
+                                <p id="resGap" class="block-body"></p>
+                            </div>
+
+                            <div class="idea-block highlight-block">
+                                <div class="block-title">⚗️ Falsifiable Research Hypothesis:</div>
+                                <p id="resHypothesis" class="block-body"></p>
+                            </div>
+
+                            <div class="idea-block">
+                                <div class="block-title">🛠️ Proposed Experimental Methodology:</div>
+                                <ul id="resMethodology" class="block-list"></ul>
+                            </div>
+
+                            <div class="idea-meta-grid">
+                                <div class="meta-box">
+                                    <span class="mbox-title">Benchmark Datasets & Baselines</span>
+                                    <span id="resDatasets" class="mbox-content"></span>
+                                </div>
+                                <div class="meta-box">
+                                    <span class="mbox-title">Target High-Impact Venues</span>
+                                    <span id="resVenues" class="mbox-content"></span>
+                                </div>
+                            </div>
+
+                            <div class="idea-footer-bar">
+                                <button class="btn-outline-sm" onclick="copyIdeaToClipboard()">📋 Copy Proposal</button>
+                                <button class="btn-primary-action-sm" onclick="saveIdeaToDrafts()">💾 Save to Lab Notebook</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= SECTION 4: RESEARCH MATE & COLLABORATORS ================= -->
+        <section id="tab-collaborators" class="tab-view">
+            <div class="view-header">
+                <div class="collab-intro-row">
+                    <div>
+                        <h2>Find Your Research Mate & Mentors</h2>
+                        <p class="text-muted">Connect with leading professors, postdocs, and peer researchers matching your exact STEM niche.</p>
+                    </div>
+                    <div class="collab-search-box">
+                        <input type="text" id="collabNicheInput" placeholder="Filter by niche: e.g. Quantum, CRISPR, Perovskite..." oninput="handleCollabSearch()">
+                    </div>
+                </div>
+            </div>
+
+            <div class="collaborators-grid" id="collaboratorsContainer">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ================= SECTION 5: GLOBAL RESEARCH TEAMS & LABS ================= -->
+        <section id="tab-teams" class="tab-view">
+            <div class="view-header">
+                <div class="teams-intro-row">
+                    <div>
+                        <h2>Global Research Teams & World Laboratories</h2>
+                        <p class="text-muted">Explore what top scientific teams do, their current breakthrough priorities, and step-by-step guidance on how to join their research groups.</p>
+                    </div>
+                    <div class="teams-field-filter">
+                        <select id="teamFieldFilter" onchange="handleTeamFilter(this.value)">
+                            <option value="all">All Disciplines</option>
+                            <option value="Quantum">Quantum Computing & Physics</option>
+                            <option value="Robotics">Robotics & AI</option>
+                            <option value="Biotechnology">Biophysics & Biotechnology</option>
+                            <option value="AI">AI for Science</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="teams-grid" id="teamsContainer">
+                <!-- Injected via JavaScript -->
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- Modal 1: Publish / Submit Paper -->
+    <div class="modal-overlay" id="publishModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Publish / Ingest Research Paper</h3>
+                <button class="modal-close" onclick="closeModal('publishModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-hint">Add recently released peer-reviewed papers or preprints into the OpenSTEM global index.</p>
+                <div class="form-group">
+                    <label>Paper Title *</label>
+                    <input type="text" id="newPaperTitle" class="form-control" placeholder="e.g. Coherent Microwave-to-Optical Transduction...">
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>Authors *</label>
+                        <input type="text" id="newPaperAuthors" class="form-control" placeholder="Dr. Jane Doe, Dr. Alex Smith">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Lead University / Institution</label>
+                        <input type="text" id="newPaperUniv" class="form-control" placeholder="e.g. Harvard / Max Planck">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>STEM Field *</label>
+                        <select id="newPaperField" class="form-control">
+                            <option value="Quantum Computing">Quantum Computing</option>
+                            <option value="Biotechnology">Biotechnology & Genomics</option>
+                            <option value="Clean Energy">Clean Energy & Photovoltaics</option>
+                            <option value="Materials Science">Materials Science</option>
+                            <option value="Computer Science & AI">Computer Science & AI</option>
+                            <option value="Physics">Physics & Nanotech</option>
+                            <option value="Aerospace">Aerospace Engineering</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Publication Date *</label>
+                        <input type="date" id="newPaperDate" class="form-control">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>DOI Identifier</label>
+                        <input type="text" id="newPaperDoi" class="form-control" placeholder="10.1038/s41586-026-...">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Open Access PDF / Preprint URL</label>
+                        <input type="url" id="newPaperPdf" class="form-control" placeholder="https://arxiv.org/abs/...">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Abstract Summary</label>
+                    <textarea id="newPaperAbstract" class="form-control" rows="4" placeholder="Provide full scientific abstract of results..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('publishModal')">Cancel</button>
+                <button class="btn-primary-action" onclick="submitPaper()">Publish to Index</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 2: Edit Portfolio Profile -->
+    <div class="modal-overlay" id="editPortfolioModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Build & Edit Researcher Portfolio</h3>
+                <button class="modal-close" onclick="closeModal('editPortfolioModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>Full Name *</label>
+                        <input type="text" id="editPortName" class="form-control" value="Dr. Sarah Lin">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Academic Title / Role *</label>
+                        <input type="text" id="editPortRole" class="form-control" value="Associate Professor & Principal Investigator">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>University / Institution *</label>
+                        <input type="text" id="editPortUniv" class="form-control" value="Massachusetts Institute of Technology (MIT)">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Department / Faculty</label>
+                        <input type="text" id="editPortDept" class="form-control" value="Department of Physics & Quantum Engineering">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>Field of Study *</label>
+                        <input type="text" id="editPortField" class="form-control" value="Quantum Information & Condensed Matter">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>ORCID iD</label>
+                        <input type="text" id="editPortOrcid" class="form-control" value="0000-0002-1825-0097">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Academic Bio & Research Statement</label>
+                    <textarea id="editPortBio" class="form-control" rows="3">Researching scalable superconducting qubit architectures, fault-tolerant topological braiding, and cryogenic nanoscale electronics.</textarea>
+                </div>
+                <div class="form-group">
+                    <label>Official Institutional Email</label>
+                    <input type="email" id="editPortEmail" class="form-control" value="slin.quantum@mit.edu">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('editPortfolioModal')">Cancel</button>
+                <button class="btn-primary-action" onclick="savePortfolioProfile()">Save Portfolio</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 3: Add Paper to Portfolio -->
+    <div class="modal-overlay" id="addPaperModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Add Publication to Your Portfolio</h3>
+                <button class="modal-close" onclick="closeModal('addPaperModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Paper Title *</label>
+                    <input type="text" id="portPaperTitle" class="form-control" placeholder="e.g. Coherent Microwave-to-Optical Conversion">
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>Journal / Conference Venue</label>
+                        <input type="text" id="portPaperJournal" class="form-control" placeholder="e.g. Science Advances / Nature">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Publication Year</label>
+                        <input type="number" id="portPaperYear" class="form-control" value="2026">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>Citations Count</label>
+                        <input type="number" id="portPaperCitations" class="form-control" value="0">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>DOI Link</label>
+                        <input type="text" id="portPaperDoi" class="form-control" placeholder="10.1126/sciadv...">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('addPaperModal')">Cancel</button>
+                <button class="btn-primary-action" onclick="submitPortfolioPaper()">Add to Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal 4: Connect / Propose Collaboration -->
+    <div class="modal-overlay" id="connectModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Send Collaboration Inquiry</h3>
+                <button class="modal-close" onclick="closeModal('connectModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-hint">Introduce yourself to <strong id="collabTargetName">Dr. Sarah Lin</strong> to discuss co-authoring, lab visits, or research partnerships.</p>
+                <input type="hidden" id="collabTargetId">
+                <div class="form-row">
+                    <div class="form-group col-6">
+                        <label>Your Full Name *</label>
+                        <input type="text" id="collabSenderName" class="form-control" placeholder="Dr. or Scholar Name">
+                    </div>
+                    <div class="form-group col-6">
+                        <label>Your Academic Email *</label>
+                        <input type="email" id="collabSenderEmail" class="form-control" placeholder="name@university.edu">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Your Institution / Lab</label>
+                    <input type="text" id="collabSenderUniv" class="form-control" placeholder="e.g. Stanford University">
+                </div>
+                <div class="form-group">
+                    <label>Proposed Project / Topic Title</label>
+                    <input type="text" id="collabProjectTitle" class="form-control" placeholder="e.g. Joint grant on topological qubit simulation">
+                </div>
+                <div class="form-group">
+                    <label>Message & Research Alignment *</label>
+                    <textarea id="collabMessage" class="form-control" rows="4" placeholder="Describe your complementary methodology and why you'd like to collaborate..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeModal('connectModal')">Cancel</button>
+                <button class="btn-primary-action" onclick="sendCollabRequest()">Send Inquiry</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast-notification" id="toastNotification">Action completed successfully</div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
